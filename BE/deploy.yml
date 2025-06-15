@@ -1,0 +1,108 @@
+---
+- name: Java Spring 애플리케이션 배포 (Gradle 사용)
+  hosts: app_servers
+  become: yes
+  vars:
+    app_name: my-spring-app
+    app_version: "{{ lookup('env', 'BUILD_NUMBER') }}"
+    app_jar: "{{ app_name }}-{{ app_version }}.jar"
+    deploy_dir: /opt/{{ app_name }}
+    repo_url: 'https://github.com/9oormthon-univ/2024_DANPOON_TEAM_22_BE.git'
+    gradle_version: 7.5
+
+  tasks:
+    - name: 필요한 패키지 설치
+      apt:
+        name:
+          - openjdk-17-jdk
+          - wget
+        state: present
+      become: yes
+
+    - name: Gradle 설치 여부 확인
+      stat:
+        path: /opt/gradle
+      register: gradle_install
+
+    - name: Gradle 다운로드 및 설치
+      unarchive:
+        src: "https://services.gradle.org/distributions/gradle-{{ gradle_version }}-bin.zip"
+        dest: /opt/
+        remote_src: yes
+        creates: "/opt/gradle-{{ gradle_version }}"
+      when: not gradle_install.stat.exists
+
+    - name: Gradle 심볼릭 링크 생성
+      file:
+        src: "/opt/gradle-{{ gradle_version }}"
+        dest: /opt/gradle
+        state: link
+      when: not gradle_install.stat.exists
+
+    - name: 환경 변수 설정 (Gradle)
+      lineinfile:
+        path: /etc/profile.d/gradle.sh
+        create: yes
+        line: |
+          export GRADLE_HOME=/opt/gradle
+          export PATH=${GRADLE_HOME}/bin:${PATH}
+        state: present
+      notify: Reload environment
+
+    - name: 환경 변수 로드
+      shell: source /etc/profile.d/gradle.sh
+      args:
+        executable: /bin/bash
+      when: ansible_os_family == "Debian"
+
+    - name: 애플리케이션 디렉토리 생성
+      file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        owner: useongee
+
+    - name: 최신 코드 가져오기
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ deploy_dir }}"
+        version: main
+
+    - name: Gradle 빌드
+      command: gradle build
+      args:
+        chdir: "{{ deploy_dir }}"
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        GRADLE_HOME: /opt/gradle
+
+    - name: JAR 파일 복사
+      copy:
+        src: "{{ deploy_dir }}/build/libs/{{ app_name }}-*.jar"
+        dest: "{{ deploy_dir }}/{{ app_jar }}"
+        remote_src: yes
+
+    - name: 기존 애플리케이션 중지
+      systemd:
+        name: "{{ app_name }}"
+        state: stopped
+        enabled: no
+
+    - name: 새 애플리케이션 시작
+      systemd:
+        name: "{{ app_name }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        exec_start: /usr/bin/java -jar {{ deploy_dir }}/{{ app_jar }}
+        exec_stop: /bin/kill -15 $MAINPID
+
+    - name: 애플리케이션 상태 확인
+      systemd:
+        name: "{{ app_name }}"
+        state: started
+
+  handlers:
+    - name: Reload environment
+      shell: source /etc/profile.d/gradle.sh
+      args:
+        executable: /bin/bash

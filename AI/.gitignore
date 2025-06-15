@@ -1,0 +1,4 @@
+# created by virtualenv automatically
+.env
+docker-compose.yml
+.DS_Store

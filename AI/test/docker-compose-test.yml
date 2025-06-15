@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  stt-test:
+    build: .
+    environment:
+      - MODEL_SIZE=large-v3  # 환경변수로 모델 크기 설정 가능
+    command: ["python", "/app/test.py"]
+    volumes:
+      - ~/.cache/huggingface/hub:/root/.cache/huggingface/hub # TODO 캐시 볼륨 마운트, s3에서는 어디에 캐시가 저장되는지 확인 필요
