@@ -2,10 +2,6 @@
 이 저장소는 **캡스톤 프로젝트의 백엔드(API 서버)** 코드입니다.
 
 ## 실행 방법
-workflow에 있는 키 값들을 만들어서 넣어줍니다.
-단 FIREBASE_SERVICE_ACCOUNT의 경우 암호화된 값으로 넣어줍니다.
-
-AWS에서 EB를 만들고 IAM 
 
 1. Github Actions용 Secret 환경 변수 설정
 
@@ -23,7 +19,7 @@ AWS에서 EB를 만들고 IAM
 | `FIREBASE_SERVICE_ACCOUNT` | Firebase Admin SDK 서비스 키 (base64 암호화) |
 | `YML` | 배포 시 사용할 yml 파일 (base64 암호화) |
 
-> 🔐 `FIREBASE_SERVICE_ACCOUNT`, `DOCKER_COMPOSE_PROD`, `YML`은 보안상 **암호화된 문자열 (base64)** 로 저장하며, `decode 후 사용`됩니다.
+> `FIREBASE_SERVICE_ACCOUNT`, `DOCKER_COMPOSE_PROD`, `YML`은 보안상 **암호화된 문자열 (base64)** 로 저장하며, `decode 후 사용`됩니다.
 
 
 ### 2. Firebase Admin SDK 설정
