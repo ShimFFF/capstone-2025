@@ -136,7 +136,22 @@ class MessageProcessor:
                 analysisResultStatus="ERROR",
                 sttContent=str(e),
             )
+            
+class Analyzer:
+    @staticmethod
+    def check_similarity(text1, text2, threshold=0.85):
+        similarity = difflib.SequenceMatcher(None, text1, text2).ratio()
+        is_similar = similarity >= threshold
+        return is_similar, similarity
 
+    @staticmethod
+    def detect_inappropriate_content(text):
+        # TODO: 부적절한 내용 탐지 로직 구현
+        # 예: inappropriate_keywords = ["금지된 단어1", "금지된 단어2"]
+        # for keyword in inappropriate_keywords:
+        #     if keyword in text:
+        #         return True
+        return False
 
 async def main():
     producer = get_producer()
