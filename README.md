@@ -7,8 +7,8 @@
 
 ### WIKI
 
-[프론트](https://github.com/ShimFFF/capstone-2024/tree/main/FE)
+[프론트](https://github.com/ShimFFF/capstone-2025/blob/main/FE/README.md)
 
-[API 서버](https://github.com/ShimFFF/capstone-2025/tree/main/BE)
+[API 서버](https://github.com/ShimFFF/capstone-2025/blob/main/BE/README.md)
 
-[음성 분석 서버](https://github.com/ShimFFF/capstone-2024/tree/main/AI)
+[음성 분석 서버](https://github.com/ShimFFF/capstone-2025/blob/main/AI/README.mdI)
